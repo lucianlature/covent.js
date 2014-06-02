@@ -1,0 +1,17 @@
+{
+  "name": "covent.js",
+  "version": "0.1.0",
+  "description": "Small JavaScript MVC framework inspired by CakePHP",
+  "main": "main.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "gulp"
+  },
+  "author": "Lucian Lature",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "~1.2.0-beta6"
+  }
+}
