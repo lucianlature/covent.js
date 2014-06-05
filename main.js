@@ -1,5 +1,6 @@
 var router      = require("./core/Router").Router,
 	Application = require("./core/Application").Application,
+	viewPostsIndexTemplate = require('./app/Views/Posts/index.html'),
 	PostsApplication,
 	PostModel,
 	app;
@@ -9,39 +10,6 @@ router.connect("/", {
 	"action": "index"
 });
 
-/*
-var View = function(target, dispatcher) {
-	dispatcher.addEventListener('show-view', function(event) {
-		var isCurrentView = target.className.indexOf(event.params) !== -1;
-		target.style.display = isCurrentView ? 'block' : 'none';
-	});
-}
-
-var Application = soma.Application.extend({
-	init: function() {
-		// create the Director router and make it available through the framework
-		this.injector.mapValue('router', new Router());
-		// create mediators for the views (DOM Element)
-		this.mediators.create(View, document.querySelectorAll('.view'))
-	},
-	start: function() {
-		// instantiate Navigation to start the app
-		this.injector.createInstance(Navigation);
-	}
-});
-
-// function model containing data (text to display)
-var Model = function () {
-	this.data = "Hello world!"
-};
-
-// function template that will update the DOM
-var Template = function(template, scope, element, model) {
-	scope.content = model.data;
-	template.render();
-};
-*/
-
 PostsApplication = {
 	start: function () {
 		var controller,
@@ -50,7 +18,7 @@ PostsApplication = {
 			view;
 
 		model = {
-			_data: {'foo': 'bar'},
+			_data: {'foo': 'Click me!'},
 			getData: function () {
 				return this._data;
 			}
@@ -78,6 +46,13 @@ PostsApplication = {
 			action: function () {
 				this.initialize();
 				this.set(this.model.getData());
+			},
+			showAll: function () {
+				this.set(this.model.getData());
+			},
+			showActive: function () {
+				var data = this.model.findByCompleted('false');
+				this.set(data);
 			}
 		};
 
@@ -92,19 +67,45 @@ PostsApplication = {
 				this.views.push(view);
 			},
 			registerEvents: function () {
-				var control = this.control;
+				var control = this.control,
+					_this = this;
 				// get views
 				this.views.forEach(function (view) {
 					Object.keys(control).forEach(function (selector) {
 						Object.keys(control[selector]).forEach( function (eventType) {
 							var handler = control[selector][eventType];
-							view.getNode()[0].querySelectorAll(selector)[0].addEventListener(eventType, this[handler].bind(this));
-						}, this);
-					}, this);
-				}, this);
+							view.getNode()[0].querySelectorAll(selector)[0].addEventListener(eventType, _this[handler].bind(_this));
+						});
+					});
+				});
 			},
-			info: function (event) {
+			info: function () {
 				console.info('info dispatched');
+				alert('Clicked!');
+			},
+			newTodo: function (title) {
+				that.addItem(title);
+			},
+			itemEdit: function (item) {
+				that.editItem(item.id);
+			},
+			itemEditDone: function (item) {
+				that.editItemSave(item.id, item.title);
+			},
+			itemEditCancel: function (item) {
+				that.editItemCancel(item.id);
+			},
+			itemRemove: function (item) {
+				that.removeItem(item.id);
+			},
+			itemToggle: function (item) {
+				that.toggleComplete(item.id, item.completed);
+			},
+			removeCompleted: function () {
+				that.removeCompletedItems();
+			},
+			toggleAll: function (status) {
+				that.toggleAll(status.completed);
 			}
 		};
 
@@ -122,7 +123,8 @@ PostsApplication = {
 					div = document.createElement('div'),
 					span = document.createElement('span');
 				div.className = 'coventView';
-				span.innerHTML = 'foo => ' + this.data.foo;
+				// inject template
+				div.innerHTML = viewPostsIndexTemplate;
 				div.appendChild(span);
 				docfrag.appendChild(div);
 				document.body.appendChild(docfrag);
