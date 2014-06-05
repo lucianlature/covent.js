@@ -82,24 +82,40 @@ PostsApplication = {
 		};
 
 		viewcontroller = {
-			view: null,
-			events: {
-				"click span": "info"
+			views: [],
+			control: {
+				span: {
+					click: 'info'
+				}
 			},
-			_registerEvents: function () {
-				Object.keys(this.events).forEach(function (evt) {
-
-				});
-			}
-			info: function () {
-				// do nothing yet
+			addView: function (view) {
+				this.views.push(view);
+			},
+			registerEvents: function () {
+				var control = this.control;
+				// get views
+				this.views.forEach(function (view) {
+					Object.keys(control).forEach(function (selector) {
+						Object.keys(control[selector]).forEach( function (eventType) {
+							var handler = control[selector][eventType];
+							view.getNode()[0].querySelectorAll(selector)[0].addEventListener(eventType, this[handler].bind(this));
+						}, this);
+					}, this);
+				}, this);
+			},
+			info: function (event) {
+				console.info('info dispatched');
 			}
 		};
 
 		view = {
 			data: {},
+			domNode: null,
 			set: function (key, value) {
 				this[key] = value;
+			},
+			getNode: function () {
+				return this.domNode;
 			},
 			_render: function () {
 				var docfrag = document.createDocumentFragment(),
@@ -107,10 +123,10 @@ PostsApplication = {
 					span = document.createElement('span');
 				div.className = 'coventView';
 				span.innerHTML = 'foo => ' + this.data.foo;
-				span.addEventListener("click", modifyText, false);
 				div.appendChild(span);
 				docfrag.appendChild(div);
 				document.body.appendChild(docfrag);
+				this.domNode = document.querySelectorAll('.coventView');
 			},
 			render: function () {
 				console.info('view render');
@@ -120,6 +136,8 @@ PostsApplication = {
 
 		controller.action();
 		view.render();
+		viewcontroller.addView(view);
+		viewcontroller.registerEvents();
 	}
 }
 

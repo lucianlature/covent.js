@@ -12,6 +12,7 @@
   "author": "Lucian Lature",
   "license": "ISC",
   "devDependencies": {
-    "webpack": "~1.2.0-beta6"
+    "webpack": "~1.2.0-beta6",
+    "soma-events": "~0.5.6"
   }
 }
