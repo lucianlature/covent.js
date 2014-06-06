@@ -59,8 +59,8 @@ PostsApplication = {
 		viewcontroller = {
 			views: [],
 			control: {
-				span: {
-					click: 'info'
+				'#new-todo': {
+					change: 'addNew'
 				}
 			},
 			addView: function (view) {
@@ -79,9 +79,9 @@ PostsApplication = {
 					});
 				});
 			},
-			info: function () {
+			addNew: function (event) {
 				console.info('info dispatched');
-				alert('Clicked!');
+				var newTodo = event.target.value;
 			},
 			newTodo: function (title) {
 				that.addItem(title);
