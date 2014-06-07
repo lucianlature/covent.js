@@ -5,6 +5,20 @@ var router      = require("./core/Router").Router,
 	PostModel,
 	app;
 
+function deepFind(obj, path) {
+  var paths = path.split('.'),
+  	  current = obj,
+  	  i;
+  for (i = 0; i < paths.length; ++i) {
+    if (void 0 === current[paths[i]]) {
+      return undefined;
+    } else {
+      current = current[paths[i]];
+    }
+  }
+  return current;
+}
+
 router.connect("/", {
 	"controller": "posts",
 	"action": "index"
@@ -27,6 +41,7 @@ PostsApplication = {
 		controller = {
 			view: null,
 			model: null,
+			layout: 'master',
 			initialize: function () {
 				this._setModel(model);
 				this._setView(view);
@@ -45,7 +60,11 @@ PostsApplication = {
 			},
 			action: function () {
 				this.initialize();
-				this.set(this.model.getData());
+				this.set({
+					Todo: {
+						id: null
+					}
+				});
 			},
 			showAll: function () {
 				this.set(this.model.getData());
@@ -66,6 +85,9 @@ PostsApplication = {
 			addView: function (view) {
 				this.views.push(view);
 			},
+			registerModelBindings: function () {
+				// do nothing yet
+			},
 			registerEvents: function () {
 				var control = this.control,
 					_this = this;
@@ -73,39 +95,21 @@ PostsApplication = {
 				this.views.forEach(function (view) {
 					Object.keys(control).forEach(function (selector) {
 						Object.keys(control[selector]).forEach( function (eventType) {
-							var handler = control[selector][eventType];
-							view.getNode()[0].querySelectorAll(selector)[0].addEventListener(eventType, _this[handler].bind(_this));
+							var handler = control[selector][eventType],
+								el = view.getNode()[0].querySelectorAll(selector)[0],
+								lookup = el.getAttribute("data-model-id"),
+								value = deepFind(view, lookup);
+							el.addEventListener(eventType, _this[handler].bind(_this), {
+								lookup: value
+							});
 						});
 					});
 				});
 			},
 			addNew: function (event) {
+				debugger
 				console.info('info dispatched');
 				var newTodo = event.target.value;
-			},
-			newTodo: function (title) {
-				that.addItem(title);
-			},
-			itemEdit: function (item) {
-				that.editItem(item.id);
-			},
-			itemEditDone: function (item) {
-				that.editItemSave(item.id, item.title);
-			},
-			itemEditCancel: function (item) {
-				that.editItemCancel(item.id);
-			},
-			itemRemove: function (item) {
-				that.removeItem(item.id);
-			},
-			itemToggle: function (item) {
-				that.toggleComplete(item.id, item.completed);
-			},
-			removeCompleted: function () {
-				that.removeCompletedItems();
-			},
-			toggleAll: function (status) {
-				that.toggleAll(status.completed);
 			}
 		};
 
