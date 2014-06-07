@@ -1,7 +1,7 @@
 {
   "name": "covent.js",
   "version": "0.1.0",
-  "description": "Small JavaScript MVC framework inspired by CakePHP",
+  "description": "Small JavaScript MVC framework",
   "main": "main.js",
   "directories": {
     "test": "test"
@@ -10,7 +10,7 @@
     "test": "gulp"
   },
   "author": "Lucian Lature",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "webpack": "~1.2.0-beta6",
     "soma-events": "~0.5.6",
