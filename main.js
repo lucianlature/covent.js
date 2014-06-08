@@ -32,9 +32,20 @@ PostsApplication = {
 			view;
 
 		model = {
-			_data: {'foo': 'Click me!'},
+			_data: {
+				'id': null,
+				'title': null,
+				'completed': false
+			},
 			getData: function () {
 				return this._data;
+			},
+			setData: function (data) {
+				this._data = data.Todo;
+			},
+			save: function (data, callback) {
+				this.setData(data);
+				callback();
 			}
 		};
 
@@ -79,7 +90,7 @@ PostsApplication = {
 			views: [],
 			control: {
 				'#new-todo': {
-					change: 'addNew'
+					change: 'edit'
 				}
 			},
 			addView: function (view) {
@@ -99,17 +110,25 @@ PostsApplication = {
 								el = view.getNode()[0].querySelectorAll(selector)[0],
 								lookup = el.getAttribute("data-model-id"),
 								value = deepFind(view, lookup);
-							el.addEventListener(eventType, _this[handler].bind(_this), {
-								lookup: value
-							});
+							el.addEventListener(eventType, _this[handler].bind(_this, value));
 						});
 					});
 				});
 			},
-			addNew: function (event) {
-				debugger
+			edit: function (id, event) {
 				console.info('info dispatched');
-				var newTodo = event.target.value;
+				var value = event.target.value,
+					data = {
+						Todo: {
+							id: id,
+							title: value,
+							completed: false
+						}
+					};
+				model.save(data, function () {
+					console.info('model saved!');
+					// view.update();
+				});
 			}
 		};
 
