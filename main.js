@@ -1,6 +1,7 @@
 var router      = require('./core/Router').Router,
     Application = require('./core/Application').Application,
     utils       = require('./core/utils'),
+    fluent      = require('allong.es').allong.es.fluent,
     viewPostsIndexTemplate = require('./app/Views/Posts/index.html'),
     PostsApplication,
     PostModel,
@@ -18,26 +19,48 @@ PostsApplication = {
             viewcontroller,
             view;
 
-        model = utils.encapsulate({
+        baseModel = utils.encapsulate({
             initialize: function () {
+                console.log('baseModel initialize');
                 this._data = null;
                 return this.self;
             },
             getData: function () {
                 return this._data;
             },
-            setData: function (data) {
+            // setters return the object usually
+            setData: fluent(function (data) {
                 this._data = data.Todo;
-                return this.self;
+            })
+        });
+
+        var isSaveable = utils.encapsulate({
+            initialize: function () {
+                console.log('isSaveable initialize');
             },
             save: function (data, callback) {
                 this.setData(data);
                 callback();
                 return this.self;
+            },
+            notify: function () {
+                var receiver = this;
+                // do something here
             }
         });
 
-        is
+        var composedModel = utils.composeMetaobjects(
+            Object.create(baseModel),
+            isSaveable,
+            utils.encapsulate({
+                notify: undefined,
+                addData: function () {
+                    this.notify();
+                }
+            })
+        );
+
+        var model = Object.create(composedModel).initialize();
 
         controller = {
             view: null,
