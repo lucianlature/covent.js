@@ -29,7 +29,7 @@ PostsApplication = {
                 return this._data;
             },
             // setters return the object usually
-            setData: fluent(function (data) {
+            set: fluent(function (data) {
                 this._data = data.Todo;
             })
         });
@@ -37,15 +37,12 @@ PostsApplication = {
         var isSaveable = utils.encapsulate({
             initialize: function () {
                 console.log('isSaveable initialize');
+                return this.self;
             },
             save: function (data, callback) {
                 this.setData(data);
                 callback();
                 return this.self;
-            },
-            notify: function () {
-                var receiver = this;
-                // do something here
             }
         });
 
@@ -54,7 +51,7 @@ PostsApplication = {
             isSaveable,
             utils.encapsulate({
                 notify: undefined,
-                addData: function () {
+                addSong: function () {
                     this.notify();
                 }
             })
